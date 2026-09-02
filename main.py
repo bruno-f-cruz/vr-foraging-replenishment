@@ -29,6 +29,12 @@ def _():
 
 
 @app.cell
+def _(SITES, mo, pl):
+    mo.ui.table(SITES.filter(pl.col("site_label") == "RewardSite"))
+    return
+
+
+@app.cell
 def _(SITES):
     import marimo as mo
 
