@@ -1,0 +1,11 @@
+[project]
+name = "vr-foraging-replenishment"
+version = "0.1.0"
+description = "Add your description here"
+readme = "README.md"
+requires-python = ">=3.13"
+dependencies = [
+    "aind-behavior-vr-foraging[data]>=1.2",
+    "marimo[recommended]>=0.24.0",
+    "matplotlib>=3.11.1",
+]
