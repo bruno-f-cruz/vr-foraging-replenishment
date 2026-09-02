@@ -43,19 +43,25 @@ wheels = [
 [[package]]
 name = "aind-behavior-vr-foraging"
 version = "1.2.3"
-source = { registry = "https://pypi.org/simple" }
+source = { git = "https://github.com/AllenNeuralDynamics/Aind.Behavior.VrForaging?subdirectory=src%2Fpackages%2Faind_behavior_vr_foraging&rev=08fb501378bde3d8b467a1b69ab4e0a7e3370721#08fb501378bde3d8b467a1b69ab4e0a7e3370721" }
 dependencies = [
     { name = "aind-behavior-services" },
     { name = "pydantic-settings" },
-]
-sdist = { url = "https://files.pythonhosted.org/packages/9d/5e/99aa320d5b0a34f6ec0ddf83c40cc36c9d0f7d58d5c113bef170f50f1e01/aind_behavior_vr_foraging-1.2.3.tar.gz", hash = "sha256:65c3fd45cd85c96a35297d15bf0fd29680a45f37fb52aff69a3f137c68611c72", size = 37428, upload-time = "2026-08-28T02:59:19.754Z" }
-wheels = [
-    { url = "https://files.pythonhosted.org/packages/39/a6/c42ed6a57686bbd815265addccbf8768e804cb65d13b3392f4b180f7ba6b/aind_behavior_vr_foraging-1.2.3-py3-none-any.whl", hash = "sha256:946ca5e723544588d69d8aa2f178604ac72c1f9777d0c4f61b023b737e65488d", size = 51659, upload-time = "2026-08-28T02:59:17.536Z" },
 ]
 
 [package.optional-dependencies]
 data = [
     { name = "contraqctor" },
+]
+
+[[package]]
+name = "aind-behavior-vr-foraging-curricula"
+version = "1.2.3"
+source = { git = "https://github.com/AllenNeuralDynamics/Aind.Behavior.VrForaging?subdirectory=src%2Fpackages%2Faind_behavior_vr_foraging_curricula&rev=08fb501378bde3d8b467a1b69ab4e0a7e3370721#08fb501378bde3d8b467a1b69ab4e0a7e3370721" }
+dependencies = [
+    { name = "aind-behavior-curriculum" },
+    { name = "aind-behavior-vr-foraging", extra = ["data"] },
+    { name = "pydantic-settings" },
 ]
 
 [[package]]
@@ -2314,6 +2320,7 @@ version = "0.1.0"
 source = { virtual = "." }
 dependencies = [
     { name = "aind-behavior-vr-foraging", extra = ["data"] },
+    { name = "aind-behavior-vr-foraging-curricula" },
     { name = "marimo", extra = ["recommended"] },
     { name = "matplotlib" },
 ]
@@ -2321,6 +2328,7 @@ dependencies = [
 [package.metadata]
 requires-dist = [
     { name = "aind-behavior-vr-foraging", extras = ["data"], specifier = ">=1.2" },
+    { name = "aind-behavior-vr-foraging-curricula", git = "https://github.com/AllenNeuralDynamics/Aind.Behavior.VrForaging?subdirectory=src%2Fpackages%2Faind_behavior_vr_foraging_curricula&rev=08fb501378bde3d8b467a1b69ab4e0a7e3370721" },
     { name = "marimo", extras = ["recommended"], specifier = ">=0.24.0" },
     { name = "matplotlib", specifier = ">=3.11.1" },
 ]
