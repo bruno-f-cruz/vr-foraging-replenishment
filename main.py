@@ -6,26 +6,67 @@ app = marimo.App()
 
 @app.cell
 def _():
+    import marimo as mo
     import polars as pl
     import os
     os.environ["POLARS_UNKNOWN_EXTENSION_TYPE_BEHAVIOR"] = "load_as_storage"
 
+    # SOURCE contains one subfolder per session (e.g. "846439_2026-09-08T193627Z"),
+    # each holding that session's parquet tables.
+    SOURCE = "s3://aind-scratch-data/vr-foraging/replenishment-temp-sharing"
+    STORAGE_OPTIONS = {"aws_skip_signature": "true", "aws_region": "us-west-2"}
 
-    SOURCE = "s3://aind-scratch-data/vr-foraging/replenishment-temp"
+    def list_sessions(source: str) -> list[str]:
+        """List session subfolders under an S3 SOURCE prefix (anonymous access)."""
+        import re
+        import requests
+        from urllib.parse import urlparse
 
-    def read_table(table_name: str) -> pl.DataFrame:
+        parsed = urlparse(source)
+        bucket = parsed.netloc
+        prefix = parsed.path.lstrip("/")
+        if prefix and not prefix.endswith("/"):
+            prefix += "/"
+
+        region = STORAGE_OPTIONS.get("aws_region", "us-east-1")
+        resp = requests.get(
+            f"https://{bucket}.s3.{region}.amazonaws.com/",
+            params={"list-type": "2", "prefix": prefix, "delimiter": "/"},
+            timeout=30,
+        )
+        resp.raise_for_status()
+        common_prefixes = re.findall(r"<Prefix>(.*?)</Prefix>", resp.text)[1:]
+        return sorted(p[len(prefix):].rstrip("/") for p in common_prefixes)
+
+    def read_table(session: str, table_name: str) -> pl.DataFrame:
         source = SOURCE.rstrip("/")
         return pl.read_parquet(
-            f"{source}/{table_name}.parquet",
-            storage_options={"aws_skip_signature": "true", "aws_region": "us-west-2"},
+            f"{source}/{session}/{table_name}.parquet",
+            storage_options=STORAGE_OPTIONS,
         )
+    return SOURCE, list_sessions, mo, pl, read_table
 
-    SITES = read_table("sites")
-    LICKS = read_table("licks")
-    POSITION_VELOCITY = read_table("position_velocity")
-    SESSION_METADATA = read_table("session")
-    SOFTWARE_EVENTS = read_table("software_events")
-    return LICKS, POSITION_VELOCITY, SITES, SOFTWARE_EVENTS, pl
+
+@app.cell
+def _(SOURCE, list_sessions, mo):
+    _sessions = list_sessions(SOURCE)
+    session_picker = mo.ui.dropdown(
+        options=_sessions,
+        value=_sessions[0] if _sessions else None,
+        label="Session",
+    )
+    session_picker
+    return (session_picker,)
+
+
+@app.cell
+def _(read_table, session_picker):
+    SITES = read_table(session_picker.value, "sites")
+    LICKS = read_table(session_picker.value, "licks")
+    POSITION_VELOCITY = read_table(session_picker.value, "position_velocity")
+    SESSION_METADATA = read_table(session_picker.value, "session")
+    SOFTWARE_EVENTS = read_table(session_picker.value, "software_events")
+    return LICKS, POSITION_VELOCITY, SITES, SOFTWARE_EVENTS
 
 
 @app.cell
@@ -35,9 +76,7 @@ def _(SITES, mo, pl):
 
 
 @app.cell
-def _(SITES):
-    import marimo as mo
-
+def _(SITES, mo):
     from plotting import build_patch_ethogram
 
     # Widget to pick which window of patches (by patch_index) to render.
