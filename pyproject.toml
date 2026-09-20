@@ -5,12 +5,9 @@ description = "Add your description here"
 readme = "README.md"
 requires-python = ">=3.13"
 dependencies = [
-    "aind-behavior-vr-foraging[data]>=1.2",
-    "aind-behavior-vr-foraging-curricula",
+    "aind-behavior-vr-foraging[data]>=1.2.6",
+    "aind-behavior-vr-foraging-curricula>=1.2.6",
+    "aind-behavior-services == 0.13.7",
     "marimo[recommended]>=0.24.0",
     "matplotlib>=3.11.1",
 ]
-
-# we can remove this once we release upstream
-[tool.uv.sources]
-aind-behavior-vr-foraging-curricula = { git = "https://github.com/AllenNeuralDynamics/Aind.Behavior.VrForaging", rev = "08fb501378bde3d8b467a1b69ab4e0a7e3370721", subdirectory = "src/packages/aind_behavior_vr_foraging_curricula" }
